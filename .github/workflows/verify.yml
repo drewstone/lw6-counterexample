@@ -1,0 +1,15 @@
+name: verify
+on:
+  push:
+  pull_request:
+jobs:
+  certificates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # The whole claim re-verifies from the integer weights with stdlib-only interval
+      # arithmetic. Non-zero exit means a certificate failed and the badge goes red.
+      - run: python3 verify.py

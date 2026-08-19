@@ -1,0 +1,285 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\definecolor{linkblue}{RGB}{25,60,120}
+\usepackage[colorlinks=true,linkcolor=linkblue,citecolor=linkblue,urlcolor=linkblue]{hyperref}
+\usepackage{microtype}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\I}{\mathrel{;}}
+\DeclareMathOperator{\Ent}{H}
+
+\title{An explicit family of classical states refuting a conjecture of Linden and Winter}
+\author{Drew Stone\thanks{\texttt{drewstone329@gmail.com}. Code and machine-checkable
+certificates: \url{https://github.com/drewstone/lw6-counterexample}.}}
+\date{August 19, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Linden and Winter (\emph{Commun.\ Math.\ Phys.}\ 259:129--138, 2005) proved that any
+four-party quantum state with $I(A\I C|B)=I(C\I B|A)=I(A\I B|D)=0$ satisfies
+$I(C\I D)\ge I(C\I AB)$, and conjectured (their Conjecture~6) that this constrained
+inequality is stable: that positive constants $k_1,k_2,k_3$ exist with
+$k_1 I(A\I C|B)+k_2 I(C\I B|A)+k_3 I(A\I B|D)+I(C\I D)-I(C\I AB)\ge 0$
+for all quadripartite states. We exhibit an explicit one-parameter family of
+\emph{classical} probability distributions on four bits --- six atoms, integer weights in
+closed form --- on which $I(A\I C|B)$ and $I(A\I B|D)$ vanish identically while the ratio
+$\bigl[I(C\I AB)-I(C\I D)\bigr]/I(C\I B|A)$ grows without bound. Consequently no choice of
+positive constants satisfies the conjectured inequality, even for classical states: the
+conjecture is false. The vanishing of the two conditional mutual informations is an exact
+combinatorial identity; the divergence of the ratio follows from an elementary asymptotic
+analysis, and is independently certified by directed-rounding interval arithmetic, which
+also yields explicit refuting states for every $(k_1,k_2,k_3)$ with
+$k_2\le 10^{24}$. All certificates re-verify from a single dependency-free Python script.
+\end{abstract}
+
+\section{Introduction}
+
+Which linear inequalities constrain the von Neumann entropies of the reduced states of a
+multipartite quantum state? For up to three parties the answer is classical: strong
+subadditivity and weak monotonicity~\cite{LiebRuskai1973} generate all inequalities, and
+Pippenger~\cite{Pippenger2003} asked whether anything new appears for four or more
+parties. No unconstrained inequality beyond the Lieb--Ruskai family has been found since
+1973.
+
+Linden and Winter~\cite{LindenWinter2005} made the first advance past this point,
+proving a new \emph{constrained} inequality:
+
+\begin{quote}
+\textbf{Theorem (Linden--Winter).} If a four-party state $\rho_{ABCD}$ satisfies
+$I(A\I C|B)=I(C\I B|A)=I(A\I B|D)=0$, then $I(C\I D)\ge I(C\I AB)$.
+\end{quote}
+
+\noindent
+They closed the paper by conjecturing that the constraint can be relaxed linearly:
+
+\begin{quote}
+\textbf{Conjecture 6 (Linden--Winter).} There exist positive real constants
+$k_1,k_2,k_3$ such that for all quadripartite quantum states,
+\begin{equation}\label{eq:lw6}
+k_1\, I(A\I C|B) + k_2\, I(C\I B|A) + k_3\, I(A\I B|D) + I(C\I D) - I(C\I AB)\;\ge\;0 .
+\end{equation}
+\end{quote}
+
+\noindent
+A proof would have produced the first new unconstrained inequality for the von Neumann
+entropy in over five decades. We show the conjecture fails, already for classical states.
+
+\begin{theorem}\label{thm:main}
+No positive constants $k_1,k_2,k_3$ satisfy~\eqref{eq:lw6}. Specifically, for the family
+$W_L$ of classical distributions in Definition~\ref{def:family}: $I(A\I C|B)$ and
+$I(A\I B|D)$ vanish identically on the family, and
+$R_L := \bigl[I(C\I AB)-I(C\I D)\bigr]/I(C\I B|A) \longrightarrow \infty$
+as $L\to\infty$. Hence for any positive $(k_1,k_2,k_3)$, every $L$ with $R_L > k_2$ gives
+$f_k(W_L)<0$ in~\eqref{eq:lw6}.
+\end{theorem}
+
+Classical distributions embed as diagonal quantum states, so a classical counterexample
+refutes the quantum conjecture. The constrained theorem itself is untouched: on the
+family, two of its three hypotheses hold exactly but the third,
+$I(C\I B|A)=0$, fails --- by an amount that shrinks too fast, which is precisely what the
+conjecture forbade. The result says the Linden--Winter inequality is not linearly stable:
+the deficit $I(C\I AB)-I(C\I D)$ can exceed any fixed multiple of the constraint
+violations.
+
+\paragraph{Provenance.} The family was found by an automated research system conducting a
+systematic search over supports and weight patterns, and the numerical certificates below
+were produced and cross-checked by four independently written implementations (no shared
+code), including the dependency-free verifier published with this note. The mathematics
+presented here --- the identities of Lemma~\ref{lem:zeros} and the asymptotics of
+Proposition~\ref{prop:asym} --- is human-checkable by hand.
+
+\section{The family}
+
+\begin{samepage}
+\begin{proposition}[Definition]\label{def:family}
+For an integer $L\ge 2$ let $W_L$ be the probability distribution on
+$\{0,1\}^4$ (bits ordered $A,B,C,D$) supported on six atoms, with weights proportional
+to:
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+atom $(A,B,C,D)$ & weight \\
+\midrule
+$(0,0,0,0)$ & $2\cdot 10^{\,4L+3}$ \\
+$(0,0,1,0)$ & $27\cdot 10^{\,4L+3}-27\cdot 10^{\,3L+3}$ \\
+$(1,1,0,1)$ & $2\cdot 10^{\,4L}$ \\
+$(1,1,1,1)$ & $27\cdot 10^{\,4L}$ \\
+$(0,1,0,1)$ & $2\cdot 10^{\,L+3}$ \\
+$(0,1,1,0)$ & $27\cdot 10^{\,L+3}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Equivalently, with $\delta=10^{-L}$, the weights are proportional to
+$2,\;27(1-\delta),\;\tfrac{2}{1000},\;\tfrac{27}{1000},\;2\delta^{3},\;27\delta^{3}$
+on the same atoms.
+\end{proposition}
+\end{samepage}
+
+\begin{lemma}[Two exact zeros]\label{lem:zeros}
+For every $L$: $I(A\I B|D)=0$ and $I(A\I C|B)=0$ on $W_L$, exactly.
+\end{lemma}
+
+\begin{proof}
+$I(A\I B|D)$: on the three atoms with $D=0$ the bit $A$ is constant ($=0$), and on the
+three atoms with $D=1$ the bit $B$ is constant ($=1$). Conditioned on either value of
+$D$, one of the two arguments of the mutual information is deterministic, so each
+conditional term vanishes.
+
+$I(A\I C|B)$: on the two atoms with $B=0$ the bit $A$ is constant ($=0$), so that block
+contributes zero. On the $B=1$ block the joint distribution of $(A,C)$ has the $2\times2$
+weight matrix
+$\bigl(\begin{smallmatrix} w_{0101} & w_{0110}\\ w_{1101} & w_{1111}\end{smallmatrix}\bigr)$,
+and $A$ and $C$ are conditionally independent iff its determinant vanishes:
+$w_{1101}\,w_{0110} = w_{1111}\,w_{0101}$. Both products equal
+$54\cdot 10^{\,5L+3}$.
+\end{proof}
+
+Because of Lemma~\ref{lem:zeros}, on the family the left side of~\eqref{eq:lw6} collapses
+to
+\begin{equation}\label{eq:collapse}
+f_k(W_L) \;=\; k_2\, y_L + e_L,
+\qquad y_L := I(C\I B|A),\qquad e_L := I(C\I D)-I(C\I AB),
+\end{equation}
+for \emph{every} $(k_1,k_3)$: those two coefficients multiply exact zeros.
+
+\section{Why the ratio diverges}
+
+Write $\delta=10^{-L}$ and use the normalized form of Definition~\ref{def:family}.
+Two structural observations drive everything.
+
+\begin{proposition}\label{prop:asym}
+As $\delta\to 0$: $y_L=\Theta(\delta^{5})$ while $-e_L=\Theta(\delta^{4})$, with $e_L<0$
+for all small $\delta$. Consequently $R_L=-e_L/y_L=\Theta(1/\delta)\to\infty$.
+\end{proposition}
+
+\begin{proof}[Proof sketch, elementary and self-contained]
+\emph{(i) $y_L$ needs two rare events at once.} Only the $A{=}0$ block contributes to
+$I(C\I B|A)$ (given $A{=}1$, $B\equiv 1$). Within $A{=}0$, the branch $B{=}1$ carries
+probability $\Theta(\delta^{3})$ (the two $\delta^3$-atoms), and conditioned on the two
+branches the distributions of $C$ are $(2,27)/29$ versus
+$\bigl(2,\,27(1-\delta)\bigr)/(29-27\delta)$ --- total-variation distance
+$\Theta(\delta)$. A mutual information with a $\Theta(\delta^3)$-rare branch whose
+conditional laws differ by $\Theta(\delta)$ is
+$\Theta(\delta^{3})\cdot\Theta(\delta^{2}) = \Theta(\delta^{5})$, by the local
+$\chi^2$-expansion of Kullback--Leibler divergence.
+
+\emph{(ii) $e_L$ vanishes exactly when the $\delta^3$-atoms are removed.} Set the two
+$\delta^{3}$-weights to zero. Then only four atoms remain, on which the partition of the
+sample space induced by $D$ \emph{coincides} with the partition induced by $(A,B)$: the
+$D{=}0$ atoms are exactly the $AB{=}00$ atoms and the $D{=}1$ atoms are exactly the
+$AB{=}11$ atoms. Hence $I(C\I D)=I(C\I AB)$ identically in $\delta$ on the truncated
+family, i.e.\ $e\equiv 0$. Restoring the two atoms perturbs each side of
+$e_L$ by $\Theta(\delta^{3})\cdot\Theta(\delta)=\Theta(\delta^{4})$: each
+$\delta^3$-atom sits in a $D$-block whose conditional law of $C$ it shifts at relative
+scale $\Theta(\delta)$ --- the atom $(0,1,1,0)$ joins the $D{=}0$ block, where $C$'s law
+is $\delta$-tilted, and the atom $(0,1,0,1)$ joins the $D{=}1$ block, where it is the
+sole $\delta$-scale disturbance. The two placements enter $I(C\I D)$ and $I(C\I AB)$
+asymmetrically (under $(A,B)$ both atoms sit in their own block $AB{=}01$, where together
+they leave $C$'s conditional law \emph{exactly} equal to $(2,27)/29$), and the
+$\Theta(\delta^4)$ mismatch has a strictly negative sign for small $\delta$, which the
+interval certificates of Section~\ref{sec:certificates} pin down together with its
+constant.
+
+Combining (i) and (ii): $R_L = \Theta(\delta^{4})/\Theta(\delta^{5}) =
+\Theta(1/\delta)$.
+\end{proof}
+
+\begin{remark}
+The certified computation below measures the sharp law: $R_L\,\delta \to 2$, i.e.\
+$R_L = 2\cdot 10^{L} - c + o(1)$ with $c \approx 0.6437$; and the per-step ratio
+$R_{L+1}/R_L$ is certified $\ge 1.9$ (measured: $\to 10$) at every step $2\le L\le 15$.
+Theorem~\ref{thm:main} needs only $R_L\to\infty$.
+\end{remark}
+
+\section{Machine certificates}\label{sec:certificates}
+
+The published verifier reproduces, from the integer weights alone, with directed-rounding
+decimal interval arithmetic (every logarithm bracketed one-sidedly; every certified sign
+a theorem about the printed digits):
+
+\begin{center}
+\begin{tabular}{rl}
+\toprule
+$L$ & certified lower bound on $R_L$ \\
+\midrule
+2 & $189.4773957$ \\
+3 & $1{,}998.356506$ \\
+4 & $19{,}999.25622$ \\
+8 & $199{,}999{,}999.3$ \\
+12 & $1.999999999\cdot 10^{12}$ \\
+16 & $1.999999999\cdot 10^{16}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent together with $y_L>0$ and $e_L<0$ for $2\le L\le 16$, the per-step growth
+bound, and explicit kill certificates $f_k(W_L)<0$ including
+\[
+k=(1,1,1)\;\text{at}\;L{=}2,\qquad
+k=(10^{9},10^{9},10^{9})\;\text{at}\;L{=}15,\qquad
+k=(10^{30},100,10^{30})\;\text{at}\;L{=}5,
+\]
+\[
+k=(0,10^{20},0)\;\text{at}\;L{=}22,\qquad
+k=(0,10^{24},0)\;\text{at}\;L{=}26 .
+\]
+By~\eqref{eq:collapse} a certificate at $k_2$ covers all $(k_1,k_2,k_3)$, so every
+conjectured constant triple with $k_2\le 10^{24}$ is refuted by a named, explicit
+distribution; the verifier accepts an arbitrary triple and searches out the certifying
+$L$. Four independently written implementations (interval engines in
+independent codebases, no shared code) agree on every row.
+
+\section{Discussion}
+
+What survives, and what closes. The Linden--Winter constrained inequality (their
+Theorem~1) is untouched, as are the infinite constrained families of
+Cadney--Linden--Winter~\cite{CLW2012}. What closes is the named route from the
+constrained inequality to an unconstrained one: no linear relaxation of the constraints
+works. This is consistent with, and sharpens, the current expert assessment that no
+unconstrained non-Shannon-type inequality for the von Neumann entropy is in
+sight~\cite{HHR2024}: the one standing candidate is now gone, through states as simple as
+six-atom classical distributions on four bits.
+
+The mechanism is reminiscent of the robustness failures of quantum Markov chains
+identified by Ibinson, Linden and Winter~\cite{ILW2008}: smallness of conditional mutual
+information does not control the quantities one would like it to control. Here the
+failure is sharper --- the deficit $I(C\I AB)-I(C\I D)$ is not merely uncontrolled but
+exceeds \emph{any} fixed linear multiple of the constraint violations.
+
+\begin{thebibliography}{9}
+\bibitem{LiebRuskai1973} E.~H. Lieb and M.~B. Ruskai,
+\emph{Proof of the strong subadditivity of quantum-mechanical entropy},
+J.~Math.~Phys.\ 14:1938--1941 (1973).
+
+\bibitem{Pippenger2003} N.~Pippenger,
+\emph{The inequalities of quantum information theory},
+IEEE Trans.\ Inf.\ Theory 49(4):773--789 (2003).
+
+\bibitem{LindenWinter2005} N.~Linden and A.~Winter,
+\emph{A new inequality for the von Neumann entropy},
+Commun.\ Math.\ Phys.\ 259:129--138 (2005). arXiv:quant-ph/0406162.
+
+\bibitem{ILW2008} B.~Ibinson, N.~Linden and A.~Winter,
+\emph{Robustness of quantum Markov chains},
+Commun.\ Math.\ Phys.\ 277:289--304 (2008). arXiv:quant-ph/0611057.
+
+\bibitem{CLW2012} J.~Cadney, N.~Linden and A.~Winter,
+\emph{Infinitely many constrained inequalities for the von Neumann entropy},
+IEEE Trans.\ Inf.\ Theory 58(6):3657--3663 (2012). arXiv:1107.0624.
+
+\bibitem{HHR2024} T.~He, V.~E. Hubeny and M.~Rota,
+\emph{Inner bounding the quantum entropy cone with subadditivity and subsystem coarse
+grainings}, Phys.\ Rev.\ A 109:052407 (2024). arXiv:2312.04074.
+\end{thebibliography}
+
+\end{document}
