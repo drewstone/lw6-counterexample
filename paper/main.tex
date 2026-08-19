@@ -10,6 +10,7 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
@@ -83,13 +84,42 @@ as $L\to\infty$. Hence for any positive $(k_1,k_2,k_3)$, every $L$ with $R_L > k
 $f_k(W_L)<0$ in~\eqref{eq:lw6}.
 \end{theorem}
 
+\begin{corollary}\label{cor:classical}
+The Shannon-entropy version of the Linden--Winter constrained inequality is essentially
+conditional in the sense of Kaced--Romashchenko: no positive constants make~\eqref{eq:lw6}
+hold even for all classical distributions.
+\end{corollary}
+
+\begin{proof}
+The family of Theorem~\ref{thm:main} is classical.
+\end{proof}
+
 Classical distributions embed as diagonal quantum states, so a classical counterexample
 refutes the quantum conjecture. The constrained theorem itself is untouched: on the
 family, two of its three hypotheses hold exactly but the third,
 $I(C\I B|A)=0$, fails --- by an amount that shrinks too fast, which is precisely what the
-conjecture forbade. The result says the Linden--Winter inequality is not linearly stable:
-the deficit $I(C\I AB)-I(C\I D)$ can exceed any fixed multiple of the constraint
-violations.
+conjecture forbade. In the vocabulary of Kaced and Romashchenko~\cite{KR2013}, the
+Linden--Winter constrained inequality is \emph{essentially conditional}: no finite
+Lagrange multipliers lift it to an unconstrained inequality. They established this
+phenomenon for five conditional \emph{Shannon} inequalities, including the Zhang--Yeung
+1997 conditional inequality; the present family shows the same fate for the one known
+conditional \emph{von Neumann} inequality, and since the family is classical, it
+simultaneously extends their classical list: the Shannon version of the Linden--Winter
+inequality is essentially conditional as well (Corollary~\ref{cor:classical}).
+
+Two prior results frame what is and is not being shown. Ibinson, Linden and
+Winter~\cite{ILW2008} proved that the robust-structure heuristic behind the conjecture
+fails --- tripartite quantum states can be far from Markov chains while $I(A\I C|B)$ is
+small --- and wrote that this ``casts doubts'' on the proof route; but their examples are
+tripartite, concern Markov-chain distance rather than the quadripartite functional
+in~\eqref{eq:lw6}, and are essentially quantum (the classical ratio in their setting is
+bounded). Killing the heuristic left the conjecture itself open; the present family
+closes it, classically. In the positive direction, Majenz~\cite[Thm.~2.9]{Majenz2018}
+proved that on the slice $I(A\I C|B)=I(B\I C|A)=0$ the choice $\kappa_3=1$ already
+works. Our family lives on the \emph{complementary} slice: it zeroes $I(A\I C|B)$ and
+$I(A\I B|D)$ while keeping $I(C\I B|A)>0$ (certified strictly positive in
+Section~\ref{sec:certificates}) --- exactly the term his theorem does not cover, so the
+two results are consistent and jointly pin the failure to the $\kappa_2$ direction.
 
 \paragraph{Provenance.} The family was found by an automated research system conducting a
 systematic search over supports and weight patterns, and the numerical certificates below
@@ -243,18 +273,27 @@ independent codebases, no shared code) agree on every row.
 
 What survives, and what closes. The Linden--Winter constrained inequality (their
 Theorem~1) is untouched, as are the infinite constrained families of
-Cadney--Linden--Winter~\cite{CLW2012}. What closes is the named route from the
-constrained inequality to an unconstrained one: no linear relaxation of the constraints
-works. This is consistent with, and sharpens, the current expert assessment that no
-unconstrained non-Shannon-type inequality for the von Neumann entropy is in
-sight~\cite{HHR2024}: the one standing candidate is now gone, through states as simple as
-six-atom classical distributions on four bits.
+Cadney--Linden--Winter~\cite{CLW2012} and Majenz's partial lifting on his
+slice~\cite{Majenz2018}. What closes is the named route from the constrained inequality
+to an unconstrained one: no linear relaxation of the constraints works, through states as
+simple as six-atom classical distributions on four bits.
 
-The mechanism is reminiscent of the robustness failures of quantum Markov chains
-identified by Ibinson, Linden and Winter~\cite{ILW2008}: smallness of conditional mutual
-information does not control the quantities one would like it to control. Here the
-failure is sharper --- the deficit $I(C\I AB)-I(C\I D)$ is not merely uncontrolled but
-exceeds \emph{any} fixed linear multiple of the constraint violations.
+Linden and Winter motivated the conjecture by analogy: Zhang and Yeung also first found a
+constrained Shannon inequality and ``only somewhat later their unconstrained
+inequality''~\cite{LindenWinter2005}. Completed, the analogy points the other way. Kaced
+and Romashchenko~\cite{KR2013} proved that the Zhang--Yeung 1997 conditional inequality
+itself does \emph{not} lift --- the unconstrained 1998 inequality is a different
+functional --- and the present result extends the pattern to the von Neumann side. For
+the same reason, refuting Conjecture~6 does not settle whether \emph{some} unconstrained
+non-von-Neumann-type inequality exists: the Zhang--Yeung precedent shows the lift can
+fail while a different unconstrained inequality exists. What the result does is remove
+the one standing candidate, consistent with the current assessment that no such
+inequality is in sight~\cite{HHR2024}.
+
+Independent checking is deliberately easy: the states are classical, the weights are
+integers, and the published verifier is dependency-free. The entropy vector of any $W_L$
+can also be fed to the qITIP linear-programming prover of Huang, Rippchen and
+Berta~\cite{HRB2025} as a further cross-check.
 
 \begin{thebibliography}{9}
 \bibitem{LiebRuskai1973} E.~H. Lieb and M.~B. Ruskai,
@@ -280,6 +319,17 @@ IEEE Trans.\ Inf.\ Theory 58(6):3657--3663 (2012). arXiv:1107.0624.
 \bibitem{HHR2024} T.~He, V.~E. Hubeny and M.~Rota,
 \emph{Inner bounding the quantum entropy cone with subadditivity and subsystem coarse
 grainings}, Phys.\ Rev.\ A 109:052407 (2024). arXiv:2312.04074.
+
+\bibitem{KR2013} T.~Kaced and A.~Romashchenko,
+\emph{Conditional information inequalities for entropic and almost entropic points},
+IEEE Trans.\ Inf.\ Theory 59(11):7149--7167 (2013). arXiv:1207.5742.
+
+\bibitem{Majenz2018} C.~Majenz,
+\emph{Entropy in Quantum Information Theory --- Communication and Cryptography},
+PhD thesis, University of Copenhagen (2018), Theorem~2.9. arXiv:1810.10436.
+
+\bibitem{HRB2025} S.~Huang, L.~Rippchen and M.~Berta,
+\emph{Quantum entropy prover}, ISIT 2025. arXiv:2501.16025.
 \end{thebibliography}
 
 \end{document}
