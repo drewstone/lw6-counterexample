@@ -195,11 +195,16 @@ def kill(k1, k2, k3, L, prec):
 
     x = z = 0 exactly (verified separately), so f_k = k2*y + e.
     """
+    k2 = Fraction(k2)
+    if k2 < 0:
+        raise ValueError("The certificate requires a nonnegative k2")
     y, e = coords(L, prec)
     with localcontext() as ctx:
         ctx.prec = prec
         ctx.rounding = ROUND_CEILING
-        hi = Decimal(k2) * y[1] + e[1]
+        # Round the exact rational upward before multiplying the positive y bound.
+        k2_upper = Decimal(k2.numerator) / Decimal(k2.denominator)
+        hi = k2_upper * y[1] + e[1]
     return hi if hi < 0 else None
 
 
