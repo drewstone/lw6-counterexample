@@ -4,7 +4,7 @@ on:
   pull_request:
 jobs:
   certificates:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, beelink]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
